@@ -32,8 +32,8 @@ filters_in = 128
 filters_out = 128
 height_in = 112
 width_in = 112
-height_filter = 7
-width_filter = 7
+height_filter = 3
+width_filter = 3
 pad_h = 3
 pad_w = 3
 vertical_stride = 1
@@ -44,12 +44,10 @@ alpha = 1.0
 beta = 1.0
 
 # Input tensor
-X = gpuarray.to_gpu(np.random.rand(n_input, filters_in, height_in, width_in)
-                    .astype(np.float32))
+X = gpuarray.to_gpu(np.random.rand(n_input, filters_in, height_in, width_in).astype(np.float32))
 
 # Filter tensor
-filters = gpuarray.to_gpu(np.random.rand(filters_out,
-                                         filters_in, height_filter, width_filter).astype(np.float32))
+filters = gpuarray.to_gpu(np.random.rand(filters_out, filters_in, height_filter, width_filter).astype(np.float32))
 
 # Descriptor for input
 X_desc = libcudnn.cudnnCreateTensorDescriptor()
@@ -58,8 +56,8 @@ libcudnn.cudnnSetTensor4dDescriptor(X_desc, tensor_format, data_type,
 
 # Filter descriptor
 filters_desc = libcudnn.cudnnCreateFilterDescriptor()
-libcudnn.cudnnSetFilter4dDescriptor(filters_desc, data_type, tensor_format, filters_out,
-                                    filters_in, height_filter, width_filter)
+libcudnn.cudnnSetFilter4dDescriptor(filters_desc, data_type, tensor_format,
+                                    filters_out, filters_in, height_filter, width_filter)
 
 # Convolution descriptor
 conv_desc = libcudnn.cudnnCreateConvolutionDescriptor()
@@ -74,8 +72,8 @@ _, _, height_output, width_output = libcudnn.cudnnGetConvolution2dForwardOutputD
 # Output tensor
 Y = gpuarray.empty((n_input, filters_out, height_output, width_output), np.float32)
 Y_desc = libcudnn.cudnnCreateTensorDescriptor()
-libcudnn.cudnnSetTensor4dDescriptor(Y_desc, tensor_format, data_type, n_input,
-                                    filters_out, height_output, width_output)
+libcudnn.cudnnSetTensor4dDescriptor(Y_desc, tensor_format, data_type,
+                                    n_input, filters_out, height_output, width_output)
 
 # Get pointers to GPU memory
 X_data = ctypes.c_void_p(int(X.gpudata))
