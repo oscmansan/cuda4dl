@@ -138,10 +138,10 @@ int main(int argc, const char* argv[]) {
 
   float* tensor_image = new float[width*height*3];
 
-  for (uint i=0; i < FreeImage_GetHeight(image); i++)
+  for (uint i=0; i < height; i++)
   {
       BYTE *pPixel = (BYTE *)FreeImage_GetScanLine(image, i);
-      for (uint j=0; j < FreeImage_GetWidth(image); j++)
+      for (uint j=0; j < width; j++)
       {
           tensor_image[(i*width + j)*3 + 0] = (float)pPixel[j*3+0] / 255.0;
           tensor_image[(i*width + j)*3 + 1] = (float)pPixel[j*3+1] / 255.0;
@@ -161,8 +161,8 @@ int main(int argc, const char* argv[]) {
                                         /*dataType=*/CUDNN_DATA_FLOAT,
                                         /*batch_size=*/1,
                                         /*channels=*/3,
-                                        /*image_height=*/FreeImage_GetHeight(image),
-                                        /*image_width=*/FreeImage_GetWidth(image)));
+                                        /*image_height=*/height,
+                                        /*image_width=*/width));
 
   cudnnFilterDescriptor_t kernel_descriptor;
   checkCUDNN(cudnnCreateFilterDescriptor(&kernel_descriptor));
@@ -216,8 +216,8 @@ int main(int argc, const char* argv[]) {
                                         /*dataType=*/CUDNN_DATA_FLOAT,
                                         /*batch_size=*/1,
                                         /*channels=*/3,
-                                        /*image_height=*/FreeImage_GetHeight(image),
-                                        /*image_width=*/FreeImage_GetWidth(image)));
+                                        /*image_height=*/height,
+                                        /*image_width=*/width));
 
   cudnnConvolutionFwdAlgo_t convolution_algorithm;
   checkCUDNN(
@@ -373,9 +373,9 @@ int main(int argc, const char* argv[]) {
                                      d_output));
 
       // CODING EXERCISE SHOULD FINISH HERE.
-
-      cudaMemcpy(&(tensor_image[0]), d_output, image_bytes, cudaMemcpyDeviceToHost);
   }
+
+  cudaMemcpy(&(tensor_image[0]), d_output, image_bytes, cudaMemcpyDeviceToHost);
 
   save_tensor_image("cudnn-your-output.png", tensor_image, height, width);
 
